@@ -1,0 +1,22 @@
+{% extends 'auctions/layout.html' %}
+
+{% block style %}
+    <style>
+        .gandalf {
+            width: 75%;
+        }
+    </style>
+{% endblock style %}
+
+{% block body %}
+    <div class="mt-6" align="center">
+    {% if is_403 %}
+        <img src="http://api.memegen.link/images/custom/{{ code }}/{{ error_message }}.jpg?background=https://i.imgflip.com/14xbe.jpg" alt="{{ error_message }}" class="gandalf">
+    {% else %}
+        <img src="http://api.memegen.link/images/grumpycat/{{ code }}/{{ error_message }}.jpg" alt="{{ error_message }}">
+    {% endif %}
+    </div>
+    <div class="mt-4" align="center">
+        <a href="{% url 'index' %}" class="btn btn-primary">Back to Home</a>
+    </div>
+{% endblock body %}

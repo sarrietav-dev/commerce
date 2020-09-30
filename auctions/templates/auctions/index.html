@@ -1,0 +1,97 @@
+{% extends "auctions/layout.html" %} 
+
+{% block style %}
+    <style>
+        .card img {
+            width: 100%;
+        }
+
+        .card img .thumbnail {
+            width: 300px;
+            height: 300px;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            border-radius: 12px;
+            padding: 3%;
+            margin-bottom: 6%;
+            box-shadow: 10px 10px 24px -12px rgba(0, 0, 0, 0.75);
+            display: inline-block;
+        }
+
+    </style>
+{% endblock style %}
+
+
+{% block body %}
+    <h2>
+        {% block title %}
+            Active Listings
+        {% endblock title %}
+    </h2>
+
+    {% if error_message %}
+        <div class="alert alert-danger">
+            <strong>{{ error_message }}</strong>
+        </div>
+    {% endif %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="card-columns">
+
+                    <!-- Loop through the listings -->
+                    {% for lst in listings %}
+                        {% if lst.active %}
+                            <div class="card-container">
+                                <div class="card m-3 m-md-3 m-sm-3" style="width: 18rem">
+
+                                    <!-- Image -->
+                                    {% if lst.is_not_thumbnail %}
+                                        <img src="{{ lst.image_url }}" alt="" class="thumbnail" />
+                                    {% else %}
+                                        <img src="{{ lst.image_url }}" alt="" />
+                                    {% endif %}
+
+                                    <div class="card-body">
+                                        <!-- Title -->
+                                        <h3 class="card-title">{{ lst.title }}</h3>
+
+                                        <!-- Price -->
+                                        <p class="card-subtitle" style="font-size: 18px">
+                                            <strong>Price</strong>: ${{ lst.starting_price }}
+                                        </p>
+
+                                        <!-- Date -->
+                                        <h6 class="card-text text-muted">
+                                            Created on {{ lst.creation_date }}
+                                        </h6>
+
+                                        <div class="row justify-content-between">
+
+                                            <!-- View listing page -->
+                                            <div class="col">
+                                                <a href="{% url 'listing' lst.id %}" class="btn btn-primary mt-3 py-1">View Listing</a>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

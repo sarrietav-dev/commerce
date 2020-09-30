@@ -1,0 +1,46 @@
+{% extends 'auctions/layout.html' %}
+
+{% block title %}
+    Create listing
+{% endblock title %}
+
+{% block style %}
+    <style>
+        .form-control {
+            width: 100%;
+        }
+    </style>
+{% endblock style %}
+
+{% block body %}
+
+    {% if message %}
+        <h2 style="color: red;">
+            {{ message }}
+        </h2>
+    {% endif %}
+    <form action="{% url 'create_listing' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="inputtitle">Title</label>
+            {{ form.title }}
+        </div>
+        <div class="form-group">
+            <label for="inputdesc">Description</label>
+            {{ form.desc }}
+        </div>
+        <div class="row justify-content-between">
+            <div class="col-3 ">
+                <label for="inputimage">Image</label>
+                {{ form.image }}
+            </div>
+            <div class="col-5 ">
+                <label for="inputcategory">Starting Price</label>
+                {{ form.starting_price }}
+            </div>
+            <div class="col" align="right">
+                <input type="submit" value="Submit" class="btn btn-primary" style="margin-top: 30px; text-align: right;">
+            </div>
+        </div>
+    </form>
+{% endblock body %}

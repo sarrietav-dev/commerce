@@ -1,0 +1,281 @@
+{% extends 'auctions/layout.html' %}
+
+{% block style %}
+    <style>
+        .list-group {
+            max-height: 250px;
+            overflow: scroll;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .list-group::-webkit-scrollbar {
+            width: 1px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .badge {
+            margin-left: 20px;
+        }
+    </style>
+{% endblock style %}
+
+{% block body %}
+
+    <!-- ANCHOR Header -->
+    <h1>
+        Listing: {{ listing.title }}
+
+        <!-- Active badge -->
+        {% if listing.active %}
+
+            <!-- Active -->
+            <span class="badge badge-success">
+                <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-check-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                    <path fill-rule="evenodd" d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.236.236 0 0 1 .02-.022z"/>
+                </svg>
+                Active
+            </span>
+
+        {% else %}
+        
+            <!-- ANCHOR Closed -->
+            <span class="badge badge-danger">
+                <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-slash-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                    <path fill-rule="evenodd" d="M11.354 4.646a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                </svg>
+                Closed
+            </span>
+
+        {% endif %}
+    </h1>
+
+    <div class="row">
+
+        <!-- ANCHOR Main Image --> 
+        <div class="col ml-3">
+            <div class="row">
+                <div class="col">
+
+                    {% if listing.is_image_too_large %}
+                        <img src="{{ listing.image_url }}" alt="" style="width: 450px; height: 450px;">
+                    {% else %}
+                        <img src="{{ listing.image_url }}" alt="">
+                    {% endif %}
+
+                </div>
+            </div>
+
+            {% if user.is_authenticated %}
+
+                <!-- ANCHOR Watchlist -->
+                {% if listing.active %}
+                    <div class="row mt-4">
+                        <div class="col">
+
+                            {% if has_in_watchlist %}
+
+                                <a href="{% url 'watchlist_del' listing.id %}" class="btn btn-success">
+                                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-bookmark-check-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M4 0a2 2 0 0 0-2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4zm6.854 5.854a.5.5 0 0 0-.708-.708L7.5 7.793 6.354 6.646a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l3-3z"/>
+                                    </svg>
+                                    Saved to your watchlist
+                                </a>
+
+                            {% else %}
+
+                                <a href="{% url 'watchlist_add' listing.id %}" class="btn btn-outline-primary">
+                                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-bookmark-plus" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"/>
+                                        <path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5V6H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V7H6a.5.5 0 0 1 0-1h1.5V4.5A.5.5 0 0 1 8 4z"/>
+                                    </svg>
+                                    Save to your watchlist
+                                </a>
+
+                            {% endif %}
+
+                        </div>
+                    </div>
+                {% endif %}
+            {% endif %}
+
+        </div>
+
+        <!-- ANCHOR Bids Section -->
+        <div class="col mr-3">
+            <div class="row">
+
+                <!-- Bid list -->
+                <div class="col">
+                    <ul class="list-group">
+                        {% if bids %}
+                            {% for bid in bids %}
+                                <li class="list-group-item"><strong>${{ bid.price }}</strong> by {{ bid.bidder.username }} on {{ bid.date }}</li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="list-group-item"><strong>Nobody has bet yet</strong></li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class="row justify-content-end mr-1 mt-3">
+                {% if listing.active %}
+                    {% if user.is_authenticated %}
+                        {% if is_user_owner %}
+
+                            <!-- ANCHOR Close listing button -->
+                            <div class="row">
+                                <div class="col" align="right">
+                                    <a href="{% url 'close_confirm' listing.id %}" class="btn btn-danger">
+                                        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-door-closed-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd" d="M4 1a1 1 0 0 0-1 1v13H1.5a.5.5 0 0 0 0 1h13a.5.5 0 0 0 0-1H13V2a1 1 0 0 0-1-1H4zm2 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                                        </svg>
+                                        <strong>Close Listing</strong>
+                                    </a>
+                                </div>
+                            </div>
+
+                        {% else %}
+
+                            <!-- ANCHOR Bid Form -->
+                            <form action="{% url 'bid' listing.id %}" method="post">
+
+                                {% csrf_token %}
+                                {% if bid_form.errors %}
+
+                                    <!-- Error Handling -->
+                                    {% for field in bid_form %}
+
+                                        <!-- Form fields -->
+                                        <div class="form-row ml-4">
+
+                                            <!-- Error message -->
+                                            <div class="col">
+                                                {% for error in bid_form.non_field_errors %}
+                                                    <div class="alert alert-danger"><strong>{{ error }}</strong></div>
+                                                {% endfor %}
+                                            </div>
+
+                                            <!-- Form field -->
+                                            <div class="form-group col-md-3">
+                                                {{ field }}
+                                            </div>
+
+                                            <!-- Submit button -->
+                                            <div class="col-md-2">
+                                                <input type="submit" value="Submit" class="btn btn-primary">
+                                            </div>
+
+                                        </div>
+
+                                    {% endfor %}
+
+                                {% else %}
+
+                                    <!-- Form fields -->
+                                    <div class="form-row">
+
+                                        <!-- Form field -->
+                                        <div class="form-group col-md6">
+                                            {{ bid_form }}
+                                        </div>
+
+                                        <!-- Submit button -->
+                                        <div class="col-md-2">
+                                            <input type="submit" value="Submit" class="btn btn-primary">
+                                        </div>
+
+                                    </div>
+
+                                {% endif %}
+
+                            </form>
+
+                        {% endif %}
+                    {% else %}
+
+                        <!-- If there's no user logged -->
+                        <div class="alert alert-primary">Log in to bid!</div>
+
+                    {% endif %}
+                {% else %}
+
+                    <div class="alert alert-danger">
+                        This listing is closed. The winner was <strong>{{ winner.bidder }}</strong>
+                    </div>
+
+                {% endif %}
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="row mt-4">
+
+        <!-- ANCHOR Price, Details and Description -->
+        <div class="col ml-3">
+
+            <h2>${{ listing.starting_price }}</h2>
+
+            <h4>Details</h4>
+            <ul>
+                <li>
+                    <p>Listed by {{ listing.owner.username }}</p>
+                </li>
+                <li>
+                    <p>Category: {{ listing.category}}</p>
+                </li>
+            </ul>
+
+            <h4>Description</h4>
+            <p>{{ listing.desc }}</p>
+
+        </div>
+
+        <!-- ANCHOR Comment box -->
+        <div class="col mr-3">
+            <form action="{% url 'comment' listing.id %}" method="post">
+
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col" align="right">
+                        {{ comment_form }}
+                    </div>
+                </div>
+
+                <div class="row justify-content-end">
+                    <div class="col-md-4 mt-3" align="right">
+                        {% if user.is_authenticated %}
+                            <input type="submit" value="Comment" class="btn btn-primary mt-3">
+                        {% else %}
+                            <div class="alert alert-primary">Log in to comment!</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </form> 
+        </div>
+
+    </div>
+
+    <!-- ANCHOR Comment section -->
+    {% for comment in comments %}
+
+        <div class="card m-5 mb-5 ml-3 mr-3">
+            <h5 class="card-header">{{ comment.user.username }}</h5>
+            <div class="card-body">
+                <p>{{ comment.body }}</p>
+                <h6 class="text-muted">{{ comment.date }}</h6>
+            </div>
+        </div>
+
+    {% endfor %}
+
+{% endblock body %}
